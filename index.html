@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes Intelegensi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-light: #9b4dff;
+            --primary-dark: #7b1fa2;
+            --secondary: #ff9800;
+            --text: #333;
+            --light-bg: #f9f3ff;
+            --white: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-bg);
+            color: var(--text);
+            overflow-x: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30,10 Q50,0 70,10 T90,30 Q100,50 90,70 T70,90 Q50,100 30,90 T10,70 Q0,50 10,30 T30,10" fill="none" stroke="%238a2be2" stroke-width="0.5" opacity="0.2"/></svg>');
+            background-size: 100px 100px;
+        }
+        
+        .floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-light), transparent 70%);
+            opacity: 0.15;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(10%, 15%);
+            }
+            50% {
+                transform: translate(5%, -10%);
+            }
+            75% {
+                transform: translate(-10%, 5%);
+            }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.15);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--secondary));
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        h1::after, h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            margin: 0.5rem auto;
+            border-radius: 2px;
+        }
+        
+        .welcome-screen, .identity-screen, .instructions-screen, .test-screen, .result-screen {
+            display: none;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        button:hover::after {
+            opacity: 1;
+        }
+        
+        .question {
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            border-radius: 12px;
+            background-color: var(--white);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 3px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        
+        .question:hover {
+            transform: translateY(-2px);
+        }
+        
+        .options {
+            margin-top: 0.8rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+        
+        .option {
+            padding: 0.8rem;
+            border-radius: 8px;
+            background-color: var(--white);
+            border: 1.5px solid #e0d0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 400;
+            position: relative;
+            font-size: 0.95rem;
+        }
+        
+        .option:hover {
+            border-color: var(--primary);
+            background-color: #f5edff;
+        }
+        
+        .option.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.01);
+            box-shadow: 0 3px 8px rgba(138, 43, 226, 0.2);
+        }
+        
+        .option.selected::before {
+            content: '✓';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 0.5rem 0 1.5rem;
+            border: 2px solid #e0d0f0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+        }
+        
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0d0f0;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                            transparent, 
+                            rgba(255, 255, 255, 0.3), 
+                            transparent);
+            animation: progressShine 2s infinite;
+        }
+        
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        .thank-you {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--light-bg);
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .thank-you::before {
+            content: '✨';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.1;
+            top: 10px;
+            left: 10px;
+            animation: rotate 20s linear infinite;
+        }
+        
+        .thank-you::after {
+            content: '✨';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.1;
+            bottom: 10px;
+            right: 10px;
+            animation: rotate 20s linear infinite reverse;
+        }
+        
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1.5rem 0;
+            text-align: center;
+            position: relative;
+            line-height: 1;
+        }
+        
+        .score::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            margin: 0.5rem auto;
+            border-radius: 3px;
+        }
+        
+        .user-info {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+            z-index: 1000;
+            opacity: 0;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: white;
+            border-radius: 50%;
+            animation: sparkle 1s ease-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .instructions {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .highlight {
+            background-color: rgba(138, 43, 226, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .page-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .page-navigation button {
+            margin: 0;
+            padding: 10px 20px;
+        }
+        
+        .page-info {
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            button {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .question {
+                padding: 1rem;
+            }
+            
+            .option {
+                padding: 0.7rem;
+            }
+            
+            .page-navigation {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .page-navigation button {
+                width: 100%;
+            }
+            
+            .score {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-bg" id="floatingBg"></div>
+    
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen active">
+            <h1>Selamat Datang di Tes Intelegensi</h1>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto 1.5rem;">Tes ini dirancang hanya untuk keperluan pribadi Anda</p>
+            <button id="startBtn">Mulai Tes <span class="sparkle"></span></button>
+        </div>
+
+        <!-- Identity Screen -->
+        <div class="identity-screen">
+            <h2>Identitas Diri</h2>
+            <p style="text-align: center; margin-bottom: 1.5rem;">Sebelum memulai tes, silakan isi bagian identitas diri berikut:</p>
+            
+            <label for="name">Nama Lengkap:</label>
+            <input type="text" id="name" placeholder="Masukkan nama Anda" required>
+            
+            <label for="gender">Jenis Kelamin:</label>
+            <select id="gender" required>
+                <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            
+            <label for="age">Usia:</label>
+            <input type="number" id="age" min="10" max="100" placeholder="Masukkan usia Anda" required>
+            
+            <button id="continueToInstructionsBtn">Lanjut <span class="sparkle"></span></button>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div class="instructions-screen">
+            <h2>Petunjuk Pengerjaan Tes</h2>
+            
+            <div class="instructions">
+                <p>Sebelum memulai tes, harap baca petunjuk berikut dengan seksama:</p>
+                
+                <ol>
+                    <li>Tes ini terdiri dari <span class="highlight">20 soal analogi</span> yang dibagi dalam 2 halaman (10 soal per halaman).</li>
+                    <li>Setiap soal memiliki <span class="highlight">5 pilihan jawaban</span> (A, B, C, D, E).</li>
+                    <li>Pilih jawaban yang menurut Anda paling tepat dengan mengklik pada pilihan yang tersedia.</li>
+                    <li>Gunakan tombol <span class="highlight">"Halaman Berikutnya"</span> untuk melanjutkan ke 10 soal berikutnya.</li>
+                    <li>Anda bisa kembali ke halaman sebelumnya selama belum mengirim jawaban.</li>
+                </ol>
+            </div>
+            
+            <button id="beginTestBtn">Saya Mengerti, Mulai Tes <span class="sparkle"></span></button>
+        </div>
+
+        <!-- Test Screen -->
+        <div class="test-screen">
+            <h2>Tes Intelegensi</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="page-info" id="pageInfo"></div>
+            
+            <div id="questionsContainer">
+                <!-- Questions will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="page-navigation">
+                <button id="prevPageBtn" style="display: none;">← Halaman Sebelumnya</button>
+                <button id="nextPageBtn">Halaman Berikutnya →</button>
+            </div>
+            
+            <button id="submitBtn" style="display: none; margin-top: 1rem;">Selesai & Lihat Hasil <span class="sparkle"></span></button>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-screen">
+            <h2>Hasil Tes Anda</h2>
+            <div class="user-info" id="userInfo"></div>
+            <div class="score" id="scoreDisplay"></div>
+            
+            <div class="thank-you">
+                <h3>Terima Kasih Telah Mengikuti Tes Ini</h3>
+                <p style="margin: 1.5rem 0;">✨ Semoga hari Anda penuh warna dan inspirasi! ✨</p>
+                <div style="font-size: 3rem; margin-top: 1rem;">💜</div>
+            </div>
+            
+            <button id="restartBtn">Ulangi Tes <span class="sparkle"></span></button>
+        </div>
+    </div>
+
+    <script>
+        // Questions data
+        const questions = [
+            {
+                question: "1. Tumpul : Pisau = Pecah : ?",
+                options: ["A) Kaca", "B) Retak", "C) Lem", "D) Pot", "E) Keras"],
+                correctAnswer: 0
+            },
+            {
+                question: "2. Lapar : Makan = Haus : ?",
+                options: ["A) Air", "B) Minuman", "C) Minum", "D) Dahaga", "E) Segar"],
+                correctAnswer: 2
+            },
+            {
+                question: "3. Pensil : Menulis = Penggaris : ?",
+                options: ["A) Menggambar", "B) Melukis", "C) Menggaris", "D) Kertas", "E) Ukuran"],
+                correctAnswer: 2
+            },
+            {
+                question: "4. Pedas : Cabai = Manis : ?",
+                options: ["A) Gula", "B) Madu", "C) Rasa", "D) Cokelat", "E) Garam"],
+                correctAnswer: 0
+            },
+            {
+                question: "5. Dokter : Rumah Sakit = Guru : ?",
+                options: ["A) Pelajar", "B) Sekolah", "C) Kelas", "D) Buku", "E) Pendidikan"],
+                correctAnswer: 1
+            },
+            {
+                question: "6. Kunci : Pintu = Remote : ?",
+                options: ["A) Tv", "B) Tombol", "C) Suara", "D) Baterai", "E) Layar"],
+                correctAnswer: 0
+            },
+            {
+                question: "7. Petani : Cangkul = Penulis : ?",
+                options: ["A) Komputer", "B) Kertas", "C) Pena", "D) Tinta", "E) Buku"],
+                correctAnswer: 2
+            },
+            {
+                question: "8. Gigi : Mulut = Jari : ?",
+                options: ["A) Kuku", "B) Tangan", "C) Telapak", "D) Sarung Tangan", "E) Lengan"],
+                correctAnswer: 1
+            },
+            {
+                question: "9. Ikan : Air = Burung : ?",
+                options: ["A) Udara", "B) Langit", "C) Terbang", "D) Angin", "E) Pohon"],
+                correctAnswer: 0
+            },
+            {
+                question: "10. Jantung : Darah = Paru-Paru : ?",
+                options: ["A) Oksigen", "B) Udara", "C) Napas", "D) Hidung", "E) Dada"],
+                correctAnswer: 0
+            },
+            {
+                question: "11. Membangun : Merobohkan = Mencintai : ?",
+                options: ["A) Menghargai", "B) Membenci", "C) Merawat", "D) Mengenang", "E) Menyayangi"],
+                correctAnswer: 1
+            },
+            {
+                question: "12. Aroma : Parfum = Suara : ?",
+                options: ["A) Gelombang", "B) Musik", "C) Alat", "D) Lagu", "E) Mikrofon"],
+                correctAnswer: 1
+            },
+            {
+                question: "13. Kereta Gantung : Kabel = Lift : ?",
+                options: ["A) Tangga", "B) Poros", "C) Rel Vertikal", "D) Tiang", "E) Lorong"],
+                correctAnswer: 2
+            },
+            {
+                question: "14. Kapas : Sutra = Baju : ?",
+                options: ["A) Celana", "B) Jas", "C) Kain", "D) Linen", "E) Wol"],
+                correctAnswer: 2
+            },
+            {
+                question: "15. Persegi Panjang : Balok = Lingkaran : ?",
+                options: ["A) Tabung", "B) Bola", "C) Kerucut", "D) Balok", "E) Kubus"],
+                correctAnswer: 1
+            },
+            {
+                question: "16. Sakelar : Lampu = Tuas : ?",
+                options: ["A) Listrik", "B) Mesin", "C) Gigi", "D) Tangga", "E) Dinding"],
+                correctAnswer: 1
+            },
+            {
+                question: "17. Mata : Cahaya = Hidung : ?",
+                options: ["A) Bau", "B) Aroma", "C) Wangi", "D) Udara", "E) Bau Busuk"],
+                correctAnswer: 0
+            },
+            {
+                question: "18. Data : Jaringan = Darah : ?",
+                options: ["A) Jantung", "B) Pembuluh", "C) Organ", "D) Plasma", "E) Nadi"],
+                correctAnswer: 1
+            },
+            {
+                question: "19. Paru-Paru : Oksigen = Lambung : ?",
+                options: ["A) Energi", "B) Nutrisi", "C) Makanan", "D) Pencernaan", "E) Lemak"],
+                correctAnswer: 2
+            },
+            {
+                question: "20. Koki : Dapur = Montir : ?",
+                options: ["A) Mobil", "B) Bengkel", "C) Mesin", "D) Oli", "E) Alat"],
+                correctAnswer: 1
+            }
+        ];
+
+        // DOM elements
+        const welcomeScreen = document.querySelector('.welcome-screen');
+        const identityScreen = document.querySelector('.identity-screen');
+        const instructionsScreen = document.querySelector('.instructions-screen');
+        const testScreen = document.querySelector('.test-screen');
+        const resultScreen = document.querySelector('.result-screen');
+        const startBtn = document.getElementById('startBtn');
+        const continueToInstructionsBtn = document.getElementById('continueToInstructionsBtn');
+        const beginTestBtn = document.getElementById('beginTestBtn');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const pageInfo = document.getElementById('pageInfo');
+        const userInfoDisplay = document.getElementById('userInfo');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const floatingBg = document.getElementById('floatingBg');
+
+        // Variables
+        let currentPage = 0;
+        const questionsPerPage = 10;
+        const totalPages = Math.ceil(questions.length / questionsPerPage);
+        let userAnswers = Array(questions.length).fill(null);
+        let userName = '';
+        let userGender = '';
+        let userAge = '';
+
+        // Create floating background elements
+        function createFloatingBackground() {
+            for (let i = 0; i < 10; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'floating-circle';
+                circle.style.width = `${Math.random() * 300 + 100}px`;
+                circle.style.height = circle.style.width;
+                circle.style.left = `${Math.random() * 100}%`;
+                circle.style.top = `${Math.random() * 100}%`;
+                circle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                floatingBg.appendChild(circle);
+            }
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', showIdentityScreen);
+        continueToInstructionsBtn.addEventListener('click', showInstructionsScreen);
+        beginTestBtn.addEventListener('click', startTest);
+        prevPageBtn.addEventListener('click', goToPreviousPage);
+        nextPageBtn.addEventListener('click', goToNextPage);
+        submitBtn.addEventListener('click', showResults);
+        restartBtn.addEventListener('click', restartTest);
+
+        // Initialize
+        createFloatingBackground();
+
+        // Functions
+        function showIdentityScreen() {
+            welcomeScreen.classList.remove('active');
+            identityScreen.classList.add('active');
+            addSparkleEffect(startBtn);
+        }
+
+        function showInstructionsScreen() {
+            // Get user info
+            userName = document.getElementById('name').value;
+            userGender = document.getElementById('gender').value;
+            userAge = document.getElementById('age').value;
+
+            // Validate
+            if (!userName || !userGender || !userAge) {
+                alert('Silakan lengkapi semua data identitas');
+                return;
+            }
+
+            identityScreen.classList.remove('active');
+            instructionsScreen.classList.add('active');
+            addSparkleEffect(continueToInstructionsBtn);
+        }
+
+        function startTest() {
+            instructionsScreen.classList.remove('active');
+            testScreen.classList.add('active');
+            displayCurrentPage();
+            updateProgressBar();
+            addSparkleEffect(beginTestBtn);
+        }
+
+        function displayCurrentPage() {
+            // Clear previous questions
+            questionsContainer.innerHTML = '';
+            
+            // Update page info
+            pageInfo.textContent = `Halaman ${currentPage + 1} dari ${totalPages}`;
+            
+            // Calculate start and end index for current page
+            const startIndex = currentPage * questionsPerPage;
+            const endIndex = Math.min(startIndex + questionsPerPage, questions.length);
+            
+            // Display questions for current page
+            for (let i = startIndex; i < endIndex; i++) {
+                const question = questions[i];
+                
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.innerHTML = `<h3>${question.question}</h3>`;
+                
+                const optionsElement = document.createElement('div');
+                optionsElement.className = 'options';
+                
+                question.options.forEach((option, j) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    if (userAnswers[i] === j) {
+                        optionElement.classList.add('selected');
+                    }
+                    optionElement.textContent = option;
+                    optionElement.addEventListener('click', () => selectAnswer(i, j));
+                    optionsElement.appendChild(optionElement);
+                });
+                
+                questionElement.appendChild(optionsElement);
+                questionsContainer.appendChild(questionElement);
+            }
+            
+            // Update navigation buttons
+            prevPageBtn.style.display = currentPage === 0 ? 'none' : 'block';
+            nextPageBtn.style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            submitBtn.style.display = currentPage === totalPages - 1 ? 'block' : 'none';
+        }
+
+        function selectAnswer(questionIndex, optionIndex) {
+            // Remove selected class from all options in this question
+            const questionElement = document.querySelectorAll('.question')[questionIndex % questionsPerPage];
+            const options = questionElement.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            options[optionIndex].classList.add('selected');
+            
+            // Save answer
+            userAnswers[questionIndex] = optionIndex;
+            
+            // Add sparkle effect to selected option
+            addSparkleEffect(options[optionIndex]);
+        }
+
+        function goToPreviousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                displayCurrentPage();
+                updateProgressBar();
+                addSparkleEffect(prevPageBtn);
+            }
+        }
+
+        function goToNextPage() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                displayCurrentPage();
+                updateProgressBar();
+                addSparkleEffect(nextPageBtn);
+            }
+        }
+
+        function updateProgressBar() {
+            const answeredQuestions = userAnswers.filter(answer => answer !== null).length;
+            const progress = (answeredQuestions / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Show result screen
+            testScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+            
+            // Display user info
+            userInfoDisplay.innerHTML = `
+                <div><strong>Nama:</strong> ${userName}</div>
+                <div><strong>Jenis Kelamin:</strong> ${userGender}</div>
+                <div><strong>Usia:</strong> ${userAge} tahun</div>
+            `;
+            
+            // Display score (minimalis)
+            scoreDisplay.textContent = `${score}/${questions.length}`;
+            
+            // Create confetti effect for good score
+            const percentage = (score / questions.length) * 100;
+            if (percentage >= 70) {
+                createConfetti();
+            }
+            
+            addSparkleEffect(submitBtn);
+        }
+
+        function createConfetti() {
+            const colors = ['#8a2be2', '#9b4dff', '#ff9800', '#ff6b6b', '#4ecdc4'];
+            
+            for (let i = 0; i < 120; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 8 + 4}px`;
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        function addSparkleEffect(element) {
+            for (let i = 0; i < 4; i++) {
+                const sparkle = document.createElement('span');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = `${Math.random() * 80 + 10}%`;
+                sparkle.style.top = `${Math.random() * 80 + 10}%`;
+                sparkle.style.animationDelay = `${i * 0.1}s`;
+                element.appendChild(sparkle);
+                
+                // Remove sparkle after animation
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 1000);
+            }
+        }
+
+        function restartTest() {
+            // Reset variables
+            currentPage = 0;
+            userAnswers = Array(questions.length).fill(null);
+            
+            // Remove all confetti
+            document.querySelectorAll('.confetti').forEach(el => el.remove());
+            
+            // Show welcome screen
+            resultScreen.classList.remove('active');
+            welcomeScreen.classList.add('active');
+            
+            // Reset form
+            document.getElementById('name').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('age').value = '';
+            
+            addSparkleEffect(restartBtn);
+        }
+    </script>
+</body>
+</html>
